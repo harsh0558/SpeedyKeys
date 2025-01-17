@@ -12,28 +12,37 @@ const words = [
     "map", "nest", "octopus", "paint", "quiet", "rabbit", "stone", "tower", "vase"
 ];
 
+let starttime;
+let endtime;
+let timeStarted = false;
+let timeEnded = false;
+let iterate = 0;
+let totalCharacters = 0;
+
 function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    let num = Math.floor(Math.random() * (max - min + 1)) + min;
+    while (num < 0 || num >= words.length) {
+        num = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    return num;
 }
 
 function validate(word, userInput) {
     let result = "";
-    let minLength = Math.min(word.length, userInput.length);
-    if(word.length===userInput.length){
-        for (let i = 0; i < minLength; i++) {
+    if (word.length === userInput.length) {
+        for (let i = 0; i < word.length; i++) {
             if (word[i] === userInput[i]) {
                 result += `<span style="color:green;">${userInput[i]}</span>`;
             } else {
-                result += `<span style="color:red;">${word[i]}</span>`;
+                result += `<span style="color:red;">${userInput[i]}</span>`;
             }
         }
         return result;
-    }else{
-        result = `<span style="color:orange;">${word}</span>`
-        return result;``
-    }   
+    } else {
+        result = `<span style="color:orange;">${word}</span>`;
+        return result;
+    }
 }
-
 
 let wordsArray = [];
 for (let i = 0; i < 20; i++) {
@@ -44,29 +53,53 @@ for (let i = 0; i < 20; i++) {
 let string = wordsArray.join(" ");
 
 let main_div = document.querySelector("#main");
+let result = document.querySelector("#result")
 
 let messageContainer = document.createElement("div");
 messageContainer.classList.add("words");
-messageContainer.innerHTML = string; 
+messageContainer.innerHTML = string;
 main_div.prepend(messageContainer);
 
 let input = document.querySelector("#input");
-let iterate = 0;
 
 input.addEventListener("keydown", (event) => {
-    
-    if (event.key === " " || event.key==="Enter") {
+    if ((event.key === " " || event.key === "Enter") && iterate < wordsArray.length) {
         let retVal = validate(wordsArray[iterate], input.value.trim());
-        wordsArray[iterate] = retVal; 
-        let updatedString = wordsArray.join(" "); 
+        totalCharacters += input.value.trim().length;
+        wordsArray[iterate] = retVal;
+        let updatedString = wordsArray.join(" ");
 
         let text_div = document.querySelector(".words");
-        text_div.innerHTML = updatedString; 
+        text_div.innerHTML = updatedString;
 
-        iterate = iterate+1;
+        iterate += 1;
         input.value = "";
     }
-    if(iterate===20){
-        location.reload();
+
+    if (iterate === 20) {
+        if (timeEnded===false) {
+            endtime = Date.now();
+            timeEnded = true;
+
+            let timeTakenInSeconds = (endtime - starttime) / 1000;
+            let wpm = (totalCharacters / 5) / (timeTakenInSeconds / 60);
+
+            
+            let resultDiv = document.createElement("div");
+            resultDiv.innerHTML = `
+                <h2>Typing Test Completed!</h2>
+                <p>Your typing speed is <strong>${wpm.toFixed(2)} WPM</strong>.</p>
+                <p>Time taken: <strong>${timeTakenInSeconds.toFixed(2)} seconds</strong>.</p>
+            `;
+            resultDiv.style.color = "#00ff00"; 
+            result.appendChild(resultDiv);
+        }
     }
 });
+
+input.onmousedown = () => {
+    if (timeStarted===false) {
+        starttime = Date.now();
+        timeStarted = true;
+    }
+};
