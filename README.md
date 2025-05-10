@@ -29,7 +29,7 @@
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/speedykeys.git
+   [git clone https://github.com/yourusername/speedykeys.git](https://github.com/harsh0558/SpeedyKeys.git)
    cd speedykeys
    ```
 
